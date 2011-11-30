@@ -2,15 +2,15 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <errno.h> 
+#include <errno.h>
+#include <stdlib.h> 
+#include "du.h"
 
 void callStat(char * name);
 
 int
 main(int argc, char ** argv){
     DIR *dirPtr;
-    struct dirent *entryPtr;
-    struct stat statBuf;
 
     if(argc < 2){
 	perror("You must provide a directory!");
@@ -18,17 +18,20 @@ main(int argc, char ** argv){
 	//do stuff
 	dirPtr = opendir (argv[1]);
 	while ((entryPtr = readdir (dirPtr))){
-	    if (stat (entryPtr->d_name, &statBuf) < 0) {
-		perror ("huh?  there is ");
-		//exit(1);
-	    }
 	    callStat(entryPtr->d_name);
 	}
+	printf("%lu\n", size);
 	closedir (dirPtr); 
     }
 
 return 1;
 }
-void callStat(char * name){
-
+void callStat(char * name){    
+    stat(name, &statBuf);
+    if(S_ISDIR(statBuf.st_mode)){
+	printf("%s\n", name);
+    }else{
+	size +=statBuf.st_size;
+	printf("%d\t%s\n", statBuf.st_size, name);
+    }
 }
