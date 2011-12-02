@@ -4,6 +4,8 @@
 #include <sys/types.h>
 #include <errno.h>
 #include <stdlib.h> 
+#include <unistd.h>
+#include <string.h>
 #include "du.h"
 
 void callStat(char * name);
@@ -15,7 +17,6 @@ main(int argc, char ** argv){
     if(argc < 2){
 	perror("You must provide a directory!");
     }else{
-	//do stuff
 	dirPtr = opendir (argv[1]);
 	while ((entryPtr = readdir (dirPtr))){
 	    callStat(entryPtr->d_name);
@@ -27,11 +28,20 @@ main(int argc, char ** argv){
 return 1;
 }
 void callStat(char * name){    
+    DIR * subdir;
+    struct dirent *entPtr;
     stat(name, &statBuf);
     if(S_ISDIR(statBuf.st_mode)){
+	if(!strcmp(name, ".") ==0 && !strcmp(name, "..") ==0){
+	    chdir(name);
+	    subdir = opendir(name);
+	    while ((entPtr = readdir(subdir))){
+		callStat(entPtr->d_name);
+	    }
+	}
 	printf("%s\n", name);
     }else{
 	size +=statBuf.st_size;
-	printf("%d\t%s\n", statBuf.st_size, name);
+	printf("%d\t%s\n",(int) statBuf.st_size, name);
     }
 }
