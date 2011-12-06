@@ -13,10 +13,10 @@ void callStat(char * name);
 int
 main(int argc, char ** argv){
     DIR *dirPtr;
-
     if(argc < 2){
 	perror("You must provide a directory!");
     }else{
+	callStat(argv[1]);
 	dirPtr = opendir (argv[1]);
 	while ((entryPtr = readdir (dirPtr))){
 	    callStat(entryPtr->d_name);
@@ -28,20 +28,31 @@ main(int argc, char ** argv){
 return 1;
 }
 void callStat(char * name){    
+    char help [512] = "../";
+    unsigned long subsize;
     DIR * subdir;
+    struct stat statBuf;
     struct dirent *entPtr;
     stat(name, &statBuf);
     if(S_ISDIR(statBuf.st_mode)){
 	if(!strcmp(name, ".") ==0 && !strcmp(name, "..") ==0){
-	    chdir(name);
+	    subsize = 0;
 	    subdir = opendir(name);
+	    subopen = 1;
+	    chdir(name);
 	    while ((entPtr = readdir(subdir))){
-		callStat(entPtr->d_name);
+		strcat(help, entPtr->d_name);
+		callStat(help);
 	    }
 	}
-	printf("%s\n", name);
+	if(!strcmp(name, ".") ==0 && !strcmp(name, "..") ==0){
+	    if(subopen == 1){
+		printf("%lu\t./%s\n", subsize,name);
+	    }else{
+		printf("%lu\t.%s\n", subsize,name);
+	    }
+	}
     }else{
 	size +=statBuf.st_size;
-	printf("%d\t%s\n",(int) statBuf.st_size, name);
     }
 }

@@ -1,4 +1,4 @@
 struct dirent *entryPtr;
-struct stat statBuf;
+int subopen;
 unsigned long size = 0;
 
