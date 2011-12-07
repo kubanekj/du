@@ -28,7 +28,7 @@ main(int argc, char ** argv){
 return 1;
 }
 void callStat(char * name){    
-    char help [512] = "../";
+    char help [512] = "./";
     unsigned long subsize;
     DIR * subdir;
     struct stat statBuf;
